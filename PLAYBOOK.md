@@ -35,7 +35,8 @@ Layout as of 10/5/2026, for reference only:
 A Article Date (MM/DD/YYYY) · B Publication · C Title · D Link · E Author · F Author FB · G Author Insta · H Author X · I Author LinkedIn · **J Status** · K FB/Insta/LinkedIn Caption · L Threads/X Caption · M Reel Script · N Graphic Link · O Video Link · P Date Image Posted · Q Date Reel Posted.
 
 - Never touch Video Link, Date Image Posted, or Date Reel Posted. The team fills those.
-- **Never overwrite a cell that already has content.** The team or other tools may have filled captions, scripts, or handles. If a caption cell is already filled, use that text for the post as-is (lightly fix only obvious typos). Fill only empty cells.
+- **Captions and Reel Script: always write your own** for the row you're processing (as long as its Status is empty), replacing whatever is there. Another tool pre-filled many rows with templated copy ("Here is one place to start...", "Save this for your next money conversation", "Thanks to X for including me") that Taylor does NOT want. Never reuse those phrases or that structure.
+- **Everything else: never overwrite a cell that already has content** (author, handles, links, dates). Fill only empty cells.
 - In the text below, "Status", "Main caption" (FB/Insta/LinkedIn Caption), "Threads caption", "Reel Script", and "Graphic Link" refer to those headers.
 
 **Photo folders (Google Drive)** — image files only (ignore videos). Prefer files under ~6 MB.
@@ -63,14 +64,21 @@ A Article Date (MM/DD/YYYY) · B Publication · C Title · D Link · E Author ·
 ## Step 3 — Process one mention
 **Read the article.** Find what Taylor actually said. If Author is empty, fill the byline (add the outlet if syndicated, e.g. "Chris Adam (MoneyLion, syndicated on AOL)"). For the Author FB / Insta / X / LinkedIn columns, fill an empty one only with a handle or profile URL you actually found on the article page or the author's bio page. Otherwise leave it empty. Never guess a handle.
 
-**Write copy (Main caption, Threads caption, Reel Script). Only for cells that are empty.** Voice: Taylor, first person, plain and casual, professional but human.
+**Write copy (Main caption, Threads caption, Reel Script).** Voice: Taylor, first person, plain and casual, professional but human.
+
+The job of the copy is to **connect the article to the reader's life**. Not "I was quoted in X." Build it like this:
+1. Open on the reader's situation, a moment they'd recognize (staring at a car payment, the money talk before the wedding, a "you've won!" text). Specific beats generic.
+2. Bring in what Taylor actually said in the article, in his words or a close paraphrase, as the insight for that moment.
+3. Give them one thing to think about or try, framed as a suggestion.
+4. Mention the outlet naturally ("I talked about this with GOBankingRates...") near the end. The press mention adds credibility; it isn't the headline.
+Every caption should read differently from the last few. Vary the opening move (a question, a short scene, a blunt line, a small confession) and the ending. Read the last 5 rows that have Status filled to avoid repeating yourself.
 - No buzzwords or AI-sounding phrasing. Avoid "the good news is", "here's the thing", "game-changer", rule-of-three flourishes, emoji walls and hashtag stuffing (0–3 hashtags max).
 - Compliance (Taylor is a CFP at an RIA): no guarantees. Use "may", "could", "can". Don't recommend specific products or vehicles (e.g., 529 plans, named funds, insurance products). Keep advice general. Don't default to "talk to a financial advisor" as the call to action.
 - Never sound like bragging about Taylor's own money or success.
 - Keep his quotes accurate. Paraphrase rather than invent.
-- **Main caption (FB/IG/LinkedIn):** 60–130 words. Hook line from the article's idea, one or two short paragraphs, then credit the outlet (and author if known). End with "The article is in the first comment."
+- **Main caption (FB/IG/LinkedIn):** 60–130 words following the structure above. End by pointing to the first comment for the article, worded naturally and differently each time.
 - **Threads caption:** under 450 characters, includes the article link.
-- **Reel Script:** 25–45 seconds spoken. Start with `HOOK (on screen: "...")`, then a story-led script in Taylor's voice (a relatable moment, then the point, then a question or simple takeaway). End with "(About N seconds)". Don't script the outlet as an endorsement.
+- **Reel Script:** 25–45 seconds spoken. Start with `HOOK (on screen: "...")`, then a story-led script in Taylor's voice (story, story, information, story, story): a relatable moment or a real-feeling scenario, what he told the outlet, then a question or simple takeaway. Light humor is welcome; never bragging. End with "(About N seconds)". Don't script the outlet as an endorsement.
 
 **Build the graphic.**
 1. Pick a layout that fits the content *and* differs from the last 3 runs in `log.json`. Over time aim for roughly half with a photo (`photo`, `photo_full`) and half type-only (`statement`, `number`, `question`, `quote`). Use `number` only with a real figure from the article. Use `quote` only with Taylor's exact words (25 words or fewer). Use `theme_flip` sometimes for variety.
