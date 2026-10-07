@@ -17,9 +17,10 @@ Posts go to GoHighLevel as *in review* for Claudia. Nothing publishes without he
 | GHL location | TaylorKovar.com `CoD1jBJnfOnS8iAmntku` |
 | GHL userId (creator) | Taylor Kovar `0owaLTQF7YTV3EFV8N9c` |
 | GHL approver | Claudia Valladares `3nS0t3FsisxjJ3uDiKhI` |
-| Image hosting | this repo; public URL = `https://raw.githubusercontent.com/taylorkovar/tk-media-graphics/main/<path>` |
+| Image hosting | this repo; public URL = `https://raw.githubusercontent.com/taylorkovar/tk-media-graphics/main/<path>`. Images are rendered **by a GitHub Action** from a spec you queue (see "Publishing images") |
 | Graphic builder | `tools/brand_cards.py` (fonts in `fonts/`) |
-| Run history | `log.json` in this repo (layouts, photos, rows done). Read it first, append to it, push it. |
+| Run history | `log.json` in this repo (layouts, photos, rows done). Read it first, append to it, save it with the GitHub connector. |
+| Repo writes | **GitHub connector only** (`push_files` / `create_or_update_file`). Never `git push`, never use or ask for a token. |
 
 **GHL account IDs**
 - Facebook page: `67055050817f4e032ecbff41_CoD1jBJnfOnS8iAmntku_415562988306103_page`
@@ -82,10 +83,10 @@ Every caption should read differently from the last few. Vary the opening move (
 
 **Build the graphic.**
 1. Pick a layout that fits the content *and* differs from the last 3 runs in `log.json`. Over time aim for roughly half with a photo (`photo`, `photo_full`) and half type-only (`statement`, `number`, `question`, `quote`). Use `number` only with a real figure from the article. Use `quote` only with Taylor's exact words (25 words or fewer). Use `theme_flip` sometimes for variety.
-2. **Photo layouts:** search one of the folders above, choose an image not used in the last 30 entries of `log.json`, download it, decode to a file, and **look at it**. It must be clearly Taylor, decent quality, and appropriate. Set `focus` to where his face or upper body is.
+2. **Photo layouts:** search one of the folders above, choose an image not used in the last 30 entries of `log.json`, download it, decode to a file, and **look at it**. It must be clearly Taylor, decent quality, and appropriate. Set `focus` to where his face or upper body is. For the local preview, apply `ImageOps.exif_transpose` first (the Action does the same). Note the Drive file id for the spec.
 3. **Headline rule:** speak to the reader (a question, a reframe, or a short takeaway) in 2–4 lines of up to ~16 characters each. When a photo of Taylor is on the card, the headline must not read as a statement about Taylor's own life (no "I have $2M..." readings).
 4. Render, then **open the image and check it**: no text overflow or overlap with the credit line, and nothing awkward next to the photo. Fix and re-render if needed.
-5. Save as `media-mentions/YYYY-MM-DD_<publication-slug>_<short-topic>.jpg` (article date). Commit and push (see "Pushing" below), then confirm the public URL returns HTTP 200 before using it.
+5. Name it `media-mentions/YYYY-MM-DD_<publication-slug>_<short-topic>.jpg` (article date) and publish it through the Action (see "Publishing images" below). Confirm the public URL returns HTTP 200 **and** open the downloaded copy before using it.
 
 **Create two GHL posts** (`create-post`, status `in_review`):
 - Main: accountIds = FB page, Instagram, LinkedIn profile, LinkedIn page; `summary` = Main caption; media = [{url, type: "image/jpeg", altText}]; `followUpComment` = "Read the full article here: <link>"; `facebookPostDetails: {type: "post"}`, `instagramPostDetails: {type: "post"}`.
@@ -97,19 +98,24 @@ Every caption should read differently from the last few. Vary the opening move (
 
 ---
 
-## Pushing to GitHub
-The token comes from the task prompt. Never write it to any file in this repo, any tracker cell or any message.
-```bash
-git -c credential.helper= -c http.extraHeader="Authorization: Basic $(printf 'x-access-token:%s' "$TOKEN" | base64 -w0)" push -q https://github.com/taylorkovar/tk-media-graphics.git main
-```
-Harmless warnings like "expected 'acknowledgments'" / "push negotiation failed" can appear. Verify with `curl -s -o /dev/null -w "%{http_code}" <raw url>` (wait a few seconds; retry up to 3 times).
+## Publishing images (no token)
+Binary images can't go through the GitHub connector, so a GitHub Action renders them in the repo (`.github/workflows/render-cards.yml` runs `tools/render_queue.py`, which runs the same `tools/brand_cards.py`).
+1. Render locally first and check it (Step 3.4). The Action produces the same image from the same spec.
+2. With the GitHub connector (`push_files`, branch `main`), add `queue/<image-name>.json` containing the exact spec you rendered, minus the local `photo` path, plus:
+   - `"out": "media-mentions/<image-name>.jpg"`
+   - for photo layouts: `"photo_drive_id": "<Drive file id>"` (photo folders are shared "Anyone with the link", so the Action can download it).
+   You can queue several specs in one `push_files` call.
+3. Wait about 60 seconds, then poll `curl -s -o /dev/null -w "%{http_code}" <raw url>` every 20 seconds, up to 5 minutes.
+4. On 200, download the raw URL and **open it** to confirm it matches your local render. Only then create GHL posts.
+5. If it never appears, the Action failed (the spec stays in `queue/`). Don't post; leave that row's Status empty and report it. Remove the stale spec with `delete_file` so the next run starts clean.
+
+**log.json:** read it with `get_file_contents` (that gives the current SHA), append your entries, and save the whole file with `create_or_update_file` (include the SHA). The Action also commits to `main`, so if the save fails on a SHA mismatch, re-read and retry.
 
 ## Setup each run
 ```bash
 git clone -q https://github.com/taylorkovar/tk-media-graphics.git && cd tk-media-graphics
-git config user.name "TK Media Bot" && git config user.email "team@growviagroup.com"
 python3 -c "import PIL" || pip install --break-system-packages pillow
 ```
 
 ## Finish
-Send a short summary (if you stopped early for any reason, say exactly why and at which step): what was added, which rows were skipped and why, and anything that needs a human (an unverified handle, a run that failed). If GHL, Sheets, or GitHub fails, don't half-post. Leave Status empty for that row so the next run retries, and report the error.
+Send a short summary (if you stopped early for any reason, say exactly why and at which step): what was added, which rows were skipped and why, and anything that needs a human (an unverified handle, a run that failed). If GHL, Sheets, the GitHub connector or the render Action fails, don't half-post. Leave Status empty for that row so the next run retries, and report the error.
