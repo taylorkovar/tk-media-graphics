@@ -1,0 +1,31 @@
+name: Render media cards
+on:
+  push:
+    branches: [main]
+    paths: ["queue/**"]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: render-cards
+  cancel-in-progress: false
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -q "pillow>=11"
+      - name: Render queued cards
+        run: python tools/render_queue.py
+      - name: Commit images
+        run: |
+          git config user.name "TK Media Bot"
+          git config user.email "team@growviagroup.com"
+          git add -A media-mentions queue
+          git diff --cached --quiet && exit 0
+          git commit -m "Render queued media cards"
+          git pull --rebase -q origin main
+          git push -q origin main
