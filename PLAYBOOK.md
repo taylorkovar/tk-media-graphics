@@ -33,13 +33,13 @@ Posts go to GoHighLevel as *in review* for Claudia. Nothing publishes without he
 
 **Tracker columns: always find them by header name, never by letter.** The team rearranges this sheet. At the start of every run, read row 1 and map each header to its column letter. If a header below is missing, stop and report it instead of guessing.
 
-Layout as of 10/5/2026, for reference only:
-A Article Date (MM/DD/YYYY) · B Publication · C Title · D Link · E Author · F Author FB · G Author Insta · H Author X · I Author LinkedIn · **J Status** · K FB/Insta/LinkedIn Caption · L Threads/X Caption · M Reel Script · N Graphic Link · O Video Link · P Date Image Posted · Q Date Reel Posted.
+Layout as of 10/8/2026, for reference only:
+A Article Date (MM/DD/YYYY) · B Publication · C Title · D Link · E Author · F Author FB · G Author Insta · H Author X · I Author LinkedIn · **J Status** · K FB/Insta/LinkedIn Caption · L Threads/X Caption · M BlueSky Caption · N Reel Script · O Graphic Link · P Video Link · Q Date Image Posted · R Date Reel Posted.
 
 - Never touch Video Link, Date Image Posted, or Date Reel Posted. The team fills those.
-- **Captions and Reel Script: always write your own** for the row you're processing (as long as its Status is empty), replacing whatever is there. Another tool pre-filled many rows with templated copy ("Here is one place to start...", "Save this for your next money conversation", "Thanks to X for including me") that Taylor does NOT want. Never reuse those phrases or that structure.
+- **Captions (including BlueSky Caption) and Reel Script: always write your own** for the row you're processing (as long as its Status is empty), replacing whatever is there. Another tool pre-filled many rows with templated copy ("Here is one place to start...", "Save this for your next money conversation", "Thanks to X for including me") that Taylor does NOT want. Never reuse those phrases or that structure.
 - **Everything else: never overwrite a cell that already has content** (author, handles, links, dates). Fill only empty cells.
-- In the text below, "Status", "Main caption" (FB/Insta/LinkedIn Caption), "Threads caption", "Reel Script", and "Graphic Link" refer to those headers.
+- In the text below, "Status", "Main caption" (FB/Insta/LinkedIn Caption), "Threads caption", "Bluesky caption" (BlueSky Caption), "Reel Script", and "Graphic Link" refer to those headers.
 
 **Photo folders (Google Drive)** — image files only (ignore videos). Prefer files under ~6 MB.
 - TK Solo Pics `1bFJydk2E3CEZl8IUzysdT6FhvBDvgdcD` (main source)
@@ -80,7 +80,7 @@ Every caption should read differently from the last few. Vary the opening move (
 - Keep his quotes accurate. Paraphrase rather than invent.
 - **Main caption (FB/IG/LinkedIn):** 60–130 words following the structure above. End by pointing to the first comment for the article, worded naturally and differently each time.
 - **Threads caption:** under 450 characters, includes the article link.
-- **Bluesky caption:** 300 characters max *including* the article link (Bluesky's hard limit; long links count in full). Usually a tighter cut of the Threads caption. Bluesky has no follow-up comment, so the link goes in the caption. If the tracker has a header like "Bluesky Caption", write it there; otherwise it lives only in the GHL post.
+- **Bluesky caption:** 300 characters max *including* the article link (Bluesky's hard limit; long links count in full). Usually a tighter cut of the Threads caption. Bluesky has no follow-up comment, so the link goes in the caption. Save it in the BlueSky Caption column.
 - **Reel Script:** 25–45 seconds spoken. Start with `HOOK (on screen: "...")`, then a story-led script in Taylor's voice (story, story, information, story, story): a relatable moment or a real-feeling scenario, what he told the outlet, then a question or simple takeaway. Light humor is welcome; never bragging. End with "(About N seconds)". Don't script the outlet as an endorsement.
 
 **Build the graphic.**
@@ -97,7 +97,7 @@ Every caption should read differently from the last few. Vary the opening move (
 - All three: `type: "post"`, `userId` (creator), `scheduleDate` (ISO UTC converted from the Chicago time above, minding daylight saving), `postApprovalDetails: {approver: <Claudia>, approvalStatus: "pending", requesterNote: "Media mention: <Publication>, <date>. Auto-drafted by Claude. Check tags before approving."}`.
 - Use an idempotency key like `tk-media-<YYYYMMDD>-<slug>-main` / `-threads` / `-bluesky` so retries never double-post.
 
-**Update the tracker:** Status = `In GHL review (Claudia) - sched M/D h:mm` and Graphic Link = the image URL. Then append to `log.json`: `{date_run, row_link, kind: "new"|"throwback", layout, photo_file_id or null, image_path}`.
+**Update the tracker:** Status = `In GHL review (Claudia) - sched M/D h:mm`, the three captions and Reel Script, and Graphic Link = the image URL. Then append to `log.json`: `{date_run, row_link, kind: "new"|"throwback", layout, photo_file_id or null, image_path}`.
 
 ---
 
