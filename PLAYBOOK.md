@@ -28,6 +28,7 @@ Posts go to GoHighLevel as *in review* for Claudia. Nothing publishes without he
 - LinkedIn profile: `67a678600c011c4450eb74a3_CoD1jBJnfOnS8iAmntku_OlhS_xldVM_profile`
 - LinkedIn page: `67055081e689400600e949a9_CoD1jBJnfOnS8iAmntku_107872485_page`
 - Threads: `6aac4159cd1cd4d29e3dec4d_CoD1jBJnfOnS8iAmntku_28733261506363980_profile`
+- Bluesky (taylorkovar.bsky.social): `6ac3936857e651b3b0f33191_CoD1jBJnfOnS8iAmntku_did:plc:irkcha2fdua6pubdl7aap5dc_profile`
 - TikTok and YouTube are video-only. Skip them. X is not connected.
 
 **Tracker columns: always find them by header name, never by letter.** The team rearranges this sheet. At the start of every run, read row 1 and map each header to its column letter. If a header below is missing, stop and report it instead of guessing.
@@ -65,7 +66,7 @@ A Article Date (MM/DD/YYYY) · B Publication · C Title · D Link · E Author ·
 ## Step 3 — Process one mention
 **Read the article.** Find what Taylor actually said. If Author is empty, fill the byline (add the outlet if syndicated, e.g. "Chris Adam (MoneyLion, syndicated on AOL)"). For the Author FB / Insta / X / LinkedIn columns, fill an empty one only with a handle or profile URL you actually found on the article page or the author's bio page. Otherwise leave it empty. Never guess a handle.
 
-**Write copy (Main caption, Threads caption, Reel Script).** Voice: Taylor, first person, plain and casual, professional but human.
+**Write copy (Main caption, Threads caption, Bluesky caption, Reel Script).** Voice: Taylor, first person, plain and casual, professional but human.
 
 The job of the copy is to **connect the article to the reader's life**. Not "I was quoted in X." Build it like this:
 1. Open on the reader's situation, a moment they'd recognize (staring at a car payment, the money talk before the wedding, a "you've won!" text). Specific beats generic.
@@ -79,6 +80,7 @@ Every caption should read differently from the last few. Vary the opening move (
 - Keep his quotes accurate. Paraphrase rather than invent.
 - **Main caption (FB/IG/LinkedIn):** 60–130 words following the structure above. End by pointing to the first comment for the article, worded naturally and differently each time.
 - **Threads caption:** under 450 characters, includes the article link.
+- **Bluesky caption:** 300 characters max *including* the article link (Bluesky's hard limit; long links count in full). Usually a tighter cut of the Threads caption. Bluesky has no follow-up comment, so the link goes in the caption. If the tracker has a header like "Bluesky Caption", write it there; otherwise it lives only in the GHL post.
 - **Reel Script:** 25–45 seconds spoken. Start with `HOOK (on screen: "...")`, then a story-led script in Taylor's voice (story, story, information, story, story): a relatable moment or a real-feeling scenario, what he told the outlet, then a question or simple takeaway. Light humor is welcome; never bragging. End with "(About N seconds)". Don't script the outlet as an endorsement.
 
 **Build the graphic.**
@@ -88,11 +90,12 @@ Every caption should read differently from the last few. Vary the opening move (
 4. Render, then **open the image and check it**: no text overflow or overlap with the credit line, and nothing awkward next to the photo. Fix and re-render if needed.
 5. Name it `media-mentions/YYYY-MM-DD_<publication-slug>_<short-topic>.jpg` (article date) and publish it through the Action (see "Publishing images" below). Confirm the public URL returns HTTP 200 **and** open the downloaded copy before using it.
 
-**Create two GHL posts** (`create-post`, status `in_review`):
+**Create three GHL posts** (`create-post`, status `in_review`):
 - Main: accountIds = FB page, Instagram, LinkedIn profile, LinkedIn page; `summary` = Main caption; media = [{url, type: "image/jpeg", altText}]; `followUpComment` = "Read the full article here: <link>"; `facebookPostDetails: {type: "post"}`, `instagramPostDetails: {type: "post"}`.
 - Threads: accountIds = Threads; `summary` = Threads caption; same media.
-- Both: `type: "post"`, `userId` (creator), `scheduleDate` (ISO UTC converted from the Chicago time above, minding daylight saving), `postApprovalDetails: {approver: <Claudia>, approvalStatus: "pending", requesterNote: "Media mention: <Publication>, <date>. Auto-drafted by Claude. Check tags before approving."}`.
-- Use an idempotency key like `tk-media-<YYYYMMDD>-<slug>-main` / `-threads` so retries never double-post.
+- Bluesky: accountIds = Bluesky; `summary` = Bluesky caption (check it is 300 characters or fewer); same media; no `followUpComment`.
+- All three: `type: "post"`, `userId` (creator), `scheduleDate` (ISO UTC converted from the Chicago time above, minding daylight saving), `postApprovalDetails: {approver: <Claudia>, approvalStatus: "pending", requesterNote: "Media mention: <Publication>, <date>. Auto-drafted by Claude. Check tags before approving."}`.
+- Use an idempotency key like `tk-media-<YYYYMMDD>-<slug>-main` / `-threads` / `-bluesky` so retries never double-post.
 
 **Update the tracker:** Status = `In GHL review (Claudia) - sched M/D h:mm` and Graphic Link = the image URL. Then append to `log.json`: `{date_run, row_link, kind: "new"|"throwback", layout, photo_file_id or null, image_path}`.
 
