@@ -1,9 +1,11 @@
 # TK Media Mentions — Daily Playbook
 
-Daily job that turns Taylor Kovar's press mentions into social posts for human approval.
+Weekday job (Mon–Fri) that turns Taylor Kovar's press mentions into social posts for human approval.
 Every run does two things:
 1. **New mentions:** anything on https://choose11.com/in-the-press/ that isn't in the tracker yet (may be zero).
-2. **One throwback:** the next older mention in the tracker that hasn't been posted.
+2. **Throwbacks:** older mentions from the tracker, so that every calendar day (weekends included) has one throwback post. Usually one per run; the Thursday run covers the weekend.
+
+Posts are scheduled **two business days ahead** so Claudia has a working day to review. See "Scheduling" below.
 
 Posts go to GoHighLevel as *in review* for Claudia. Nothing publishes without her approval.
 
@@ -49,19 +51,28 @@ A Article Date (MM/DD/YYYY) · B Publication · C Title · D Link · E Author ·
 
 ---
 
+## Scheduling
+The team works Mon–Fri, so the task runs only on weekdays. Posts still go out 7 days a week.
+- **Target date** = 2 business days after the run date: Mon→Wed, Tue→Thu, Wed→Fri, Thu→Mon, Fri→Tue. (Holidays are not skipped.)
+- **New mentions:** 9:00 AM America/Chicago on the target date.
+- **Throwbacks:** exactly one per calendar day, at 12:00 PM America/Chicago. A date is *covered* when some tracker row's Status reads `... sched M/D 12:00` for that date. Each run, check every date from **tomorrow through the target date**, and schedule one throwback for each date that isn't covered, earliest date first, at most 4 per run. In a normal week that means one per run, and the Thursday run fills Sat, Sun and Mon. If a run gets missed, the next run fills the gap automatically.
+- If several cards are made in one run, give each a different layout (and a different photo).
+- Convert to UTC minding daylight saving: CDT is UTC−5 until Sun Nov 1 2026 (2 AM), then CST is UTC−6 until Sun Mar 14 2027.
+
 ## Step 1 — New mentions
 1. Fetch the press page. Each entry shows `logo-alt-text - MM/DD/YYYY Title` linking to the article.
 2. Compare links against the Link column. Anything new gets a **new row inserted at row 2** (keep newest at top), filling Article Date, Publication (clean name: "AOL", "GOBankingRates", "Yahoo Finance"...), Title, and Link.
-3. Process it (Step 3). Schedule it for **9:00 AM America/Chicago the next day**.
+3. Process it (Step 3). Schedule it for **9:00 AM America/Chicago on the target date** (see Scheduling).
 
-## Step 2 — One throwback
-1. Find the topmost row (row 3 and down) where **Status is empty**.
+## Step 2 — Throwbacks
+Work out which dates need a throwback (see Scheduling). For each one, earliest first:
+1. Find the topmost row (row 3 and down) where **Status is empty** (and that you haven't already picked this run).
 2. Open the link.
    - Dead (404, removed, paywalled to nothing): set Status = `Skipped - dead link` and try the next row.
    - Too dated to repost (a specific past tax year, stimulus checks, a past election, an expired rule, prices or rates that are clearly stale): set Status = `Skipped - dated` and try the next row.
    - Taylor is not actually quoted: set Status = `Skipped - no TK quote` and try the next row.
    - Give up after 8 tries and say so in the summary.
-3. Process it (Step 3). Schedule it for **12:00 PM America/Chicago the next day**. Captions can say "a while back" or "still true today". Never present an old article as brand-new.
+3. Process it (Step 3). Schedule it for **12:00 PM America/Chicago on that date**. Captions can say "a while back" or "still true today". Never present an old article as brand-new.
 
 ## Step 3 — Process one mention
 **Read the article.** Find what Taylor actually said. If Author is empty, fill the byline (add the outlet if syndicated, e.g. "Chris Adam (MoneyLion, syndicated on AOL)"). For the Author FB / Insta / X / LinkedIn columns, fill an empty one only with a handle or profile URL you actually found on the article page or the author's bio page. Otherwise leave it empty. Never guess a handle.
@@ -99,7 +110,7 @@ Every caption should read differently from the last few. Vary the opening move (
 - All three: `type: "post"`, `userId` (creator), `scheduleDate` (ISO UTC converted from the Chicago time above, minding daylight saving), `postApprovalDetails: {approver: <Claudia>, approvalStatus: "pending", requesterNote: "Media mention: <Publication>, <date>. Auto-drafted by Claude. Check tags before approving."}`.
 - Use an idempotency key like `tk-media-<YYYYMMDD>-<slug>-main` / `-threads` / `-bluesky` so retries never double-post.
 
-**Update the tracker:** Status = `In GHL review (Claudia) - sched M/D h:mm`, the three captions and Reel Script, and Graphic Link = the image URL. Then append to `log.json`: `{date_run, row_link, kind: "new"|"throwback", layout, masthead: true|false, photo_file_id or null, image_path, ghl_post_ids: [..], scheduled_for}`. The post IDs and layout are kept so engagement can be compared by card style later.
+**Update the tracker:** Status = `In GHL review (Claudia) - sched M/D h:mm` (exactly this format, e.g. `sched 10/17 12:00` or `sched 10/19 9:00`; the throwback coverage check reads it), the three captions and Reel Script, and Graphic Link = the image URL. Then append to `log.json`: `{date_run, row_link, kind: "new"|"throwback", layout, masthead: true|false, photo_file_id or null, image_path, ghl_post_ids: [..], scheduled_for}`. The post IDs and layout are kept so engagement can be compared by card style later.
 
 ---
 
@@ -123,4 +134,4 @@ python3 -c "import PIL" || pip install --break-system-packages pillow
 ```
 
 ## Finish
-Send a short summary (if you stopped early for any reason, say exactly why and at which step): what was added, which rows were skipped and why, and anything that needs a human (an unverified handle, a run that failed). If GHL, Sheets, the GitHub connector or the render Action fails, don't half-post. Leave Status empty for that row so the next run retries, and report the error.
+Send a short summary (if you stopped early for any reason, say exactly why and at which step): what was added and the date and time each post is scheduled for, which rows were skipped and why, and anything that needs a human (an unverified handle, a run that failed). If GHL, Sheets, the GitHub connector or the render Action fails, don't half-post. Leave Status empty for that row so the next run retries, and report the error.
