@@ -125,6 +125,8 @@ Binary images can't go through the GitHub connector, so a GitHub Action renders 
 4. On 200, download the raw URL and **open it** to confirm it matches your local render. Only then create GHL posts.
 5. If it never appears, the Action failed (the spec stays in `queue/`). Don't post; leave that row's Status empty and report it. Remove the stale spec with `delete_file` so the next run starts clean.
 
+**Shared with another robot:** the Content Mill scheduler also uses this queue. Its jobs are `queue/cm_*.json` files (a `fetch_url` that downloads a Canva PNG) and its images live in `media-mentions/content-mill/`. They are handled separately and can't fail your renders. Never edit or delete `cm_*` queue files or anything in `media-mentions/content-mill/`, and don't count them as media-mention images.
+
 **log.json:** read it with `get_file_contents` (that gives the current SHA), append your entries, and save the whole file with `create_or_update_file` (include the SHA). The Action also commits to `main`, so if the save fails on a SHA mismatch, re-read and retry.
 
 ## Setup each run
