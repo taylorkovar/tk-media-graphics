@@ -86,6 +86,7 @@ The job of the copy is to **connect the article to the reader's life**. Not "I w
 4. Mention the outlet naturally ("I talked about this with GOBankingRates...") near the end. The press mention adds credibility; it isn't the headline.
 Every caption should read differently from the last few. Vary the opening move (a question, a short scene, a blunt line, a small confession) and the ending. Read the last 5 rows that have Status filled to avoid repeating yourself.
 - No buzzwords or AI-sounding phrasing. Avoid "the good news is", "here's the thing", "game-changer", rule-of-three flourishes, emoji walls and hashtag stuffing (0–3 hashtags max).
+- Never write "I got into this/it with <outlet>" (Taylor finds it weird). Use plain wording like "I talked about this with <outlet>" or "I shared this with <outlet>".
 - Compliance (Taylor is a CFP at an RIA): no guarantees. Use "may", "could", "can". Don't recommend specific products or vehicles (e.g., 529 plans, named funds, insurance products). Keep advice general. Don't default to "talk to a financial advisor" as the call to action.
 - Never sound like bragging about Taylor's own money or success.
 - Keep his quotes accurate. Paraphrase rather than invent.
