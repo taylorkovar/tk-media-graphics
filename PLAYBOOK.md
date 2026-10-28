@@ -18,7 +18,7 @@ Posts go to GoHighLevel as *in review* for Claudia. Nothing publishes without he
 | Tracker | Google Sheet `11ciDQwCe5M3Z_lotkvX49N91e0Y8NEdoCy-RCiJYmfI`, tab **Media Mentions** (row 1 = headers, newest at top) |
 | GHL location | TaylorKovar.com `CoD1jBJnfOnS8iAmntku` |
 | GHL userId (creator) | Taylor Kovar `0owaLTQF7YTV3EFV8N9c` |
-| GHL approver | Claudia Valladares `3nS0t3FsisxjJ3uDiKhI` |
+| GHL approver | Claudia Valladares `HVPbKziWl5cst6jueTAL` (Claudia@Choose11.com, her main login; don't use her old claudia@taylorkovar.com login `3nS0t3FsisxjJ3uDiKhI`) |
 | Image hosting | this repo; public URL = `https://raw.githubusercontent.com/taylorkovar/tk-media-graphics/main/<path>`. Images are rendered **by a GitHub Action** from a spec you queue (see "Publishing images") |
 | Graphic builder | `tools/brand_cards.py` (fonts in `fonts/`) |
 | Run history | `log.json` in this repo (layouts, photos, rows done). Read it first, append to it, save it with the GitHub connector. |
