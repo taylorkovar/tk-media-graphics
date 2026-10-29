@@ -1,7 +1,8 @@
 # TK Media Mentions — Daily Playbook
 
 Weekday job (Mon–Fri) that turns Taylor Kovar's press mentions into social posts for human approval.
-Every run does two things:
+Every run does three things:
+0. **Rejections:** fix or reopen any post Claudia rejected (Step 0).
 1. **New mentions:** anything on https://choose11.com/in-the-press/ that isn't in the tracker yet (may be zero).
 2. **Throwbacks:** older mentions from the tracker, so that every calendar day (weekends included) has one throwback post. Usually one per run; the Thursday run covers the weekend.
 
@@ -60,6 +61,19 @@ The team works Mon–Fri, so the task runs only on weekdays. Posts still go out 
 - **No back-to-back topics.** Before scheduling anything, look at what is already scheduled the day before, the same day and the day after (tracker Status dates plus `log.json` `scheduled_for`). Never put two posts on the same topic (e.g. two Social Security posts) within a day of each other. For a throwback, skip to the next empty-Status row on a different topic. For a new mention, move it to the nearest day without a same-topic post; a weekend 9:00 AM slot is fine since new mentions never land there otherwise. Note the move in `log.json`. (Team feedback 10/21/2026: an SS new mention and an SS throwback on the same Friday.)
 - Convert to UTC minding daylight saving: CDT is UTC−5 until Sun Nov 1 2026 (2 AM), then CST is UTC−6 until Sun Mar 14 2027.
 
+## Step 0 — Handle rejected posts
+Do this first, every run, before Step 1. (Confirmed against a real rejection 10/29/2026.)
+1. In `log.json`, take every entry whose `scheduled_for` is tomorrow or later and call `get-post` (params `{"path": {"id": ...}}`) on each ID in its `ghl_post_ids`.
+2. Read `postApprovalDetails.approvalStatus`. `pending` or `approved`: nothing to do. `rejected`: the post's `status` also turns `failed`, and Claudia's reason is in `postApprovalDetails.approverNote`.
+3. A rejection on one platform applies to the whole set (Main, Threads, Bluesky) when they share the card, so revise all three together.
+   - **The note asks for something specific** (new photo, softer wording, shorter card): make the change. If the card changes, render it as `<same name>-v2.jpg` and publish and check it as usual. Then call `edit-post` on each post in place, keeping the same IDs and `scheduleDate`, with the full body (accountIds, summary, media, type, userId, platform details) plus `status: "in_review"` and `postApprovalDetails: {approver: <Claudia>, approvalStatus: "pending", requesterNote: "Revised per your note: <one line on what changed>. ..."}`. Use idempotency keys ending in `-rev1` (`-rev2` and so on after that). Call `get-post` again to confirm it reads `in_review` / `pending`. Update the row's captions, Reel Script and Graphic Link, but keep its Status.
+   - **The note is empty or unclear, or says to drop the post:** don't revise or delete anything. Set the row's Status to `Rejected - <her note, or "no note">`. That reopens the date (the coverage check only counts `sched M/D`), so Step 2 fills it with another row, and the rejected row is never picked again.
+   - **The post goes out within 24 hours of this run:** don't revise. Report it so a human can handle it.
+   - **The set already has a `revision` entry in `log.json` and was rejected again:** treat it as unclear.
+4. After a revision the old `approverNote` stays on the post. Decide only by `approvalStatus`, and never revise a post that reads `pending`.
+5. Add a `log.json` entry with `kind: "revision"`, `approver_note`, what changed, and any standing rule the note implies. Read past `revision` entries before writing new copy or choosing photos.
+6. Put every rejection, and what you did about it, in the run summary. If `get-post` fails, report it and continue.
+
 ## Step 1 — New mentions
 1. Fetch the press page. Each entry shows `logo-alt-text - MM/DD/YYYY Title` linking to the article.
 2. Compare links against the Link column. Anything new gets a **new row inserted at row 2** (keep newest at top), filling Article Date, Publication (clean name: "AOL", "GOBankingRates", "Yahoo Finance"...), Title, and Link.
@@ -100,7 +114,7 @@ The job of the copy is to **connect the article to the reader's life**. Not "I w
 Every caption should read differently from the last few. Vary the opening move (a wry observation, a common belief flipped, a question, a small confession); the main caption's last line is fixed (see below). Read the last 5 rows that have Status filled to avoid repeating yourself.
 - No buzzwords or AI-sounding phrasing. Avoid "the good news is", "here's the thing", "game-changer", rule-of-three flourishes, emoji walls and hashtag stuffing (0–3 hashtags max).
 - Never write "I got into this/it with <outlet>" (Taylor finds it weird). Use plain wording like "I talked about this with <outlet>" or "I shared this with <outlet>".
-- Compliance (Taylor is a CFP at an RIA): no guarantees. Use "may", "could", "can". Don't recommend specific products or vehicles (e.g., 529 plans, named funds, insurance products). Keep advice general. Don't default to "talk to a financial advisor" as the call to action.
+- Compliance (Taylor is a CFP at an RIA): no guarantees. Use "may", "could", "can". Don't recommend specific products or vehicles (e.g., 529 plans, named funds, insurance products). Keep advice general. Don't default to "talk to a financial advisor" as the call to action. On investing topics, never say what "works best" or "holds up best", and include a plain risk line (e.g. "Investing always carries risk") (Claudia's rejection 10/29/2026).
 - Never sound like bragging about Taylor's own money or success.
 - Keep his quotes accurate. Paraphrase rather than invent.
 - **Main caption (FB/IG/LinkedIn):** 50–90 words following the structure above. Don't paste Taylor's full quote into the caption, especially when it's already on the card: give the gist in one plain sentence. Always end with exactly: "Check out the full article in the comments."
