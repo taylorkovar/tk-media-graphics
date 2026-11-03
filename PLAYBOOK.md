@@ -1,7 +1,7 @@
 # TK Media Mentions — Daily Playbook
 
 Weekday job (Mon–Fri) that turns Taylor Kovar's press mentions into social posts for human approval.
-Every run does three things:
+Every run starts with a **GHL access check** (Preflight, below), then does three things:
 0. **Rejections:** fix or reopen any post Claudia rejected (Step 0).
 1. **New mentions:** anything on https://choose11.com/in-the-press/ that isn't in the tracker yet (may be zero).
 2. **Throwbacks:** older mentions from the tracker, so that every calendar day (weekends included) has one throwback post. Usually one per run; the Thursday run covers the weekend.
@@ -17,7 +17,7 @@ Posts go to GoHighLevel as *in review* for Claudia. Nothing publishes without he
 | What | Value |
 |---|---|
 | Tracker | Google Sheet `11ciDQwCe5M3Z_lotkvX49N91e0Y8NEdoCy-RCiJYmfI`, tab **Media Mentions** (row 1 = headers, newest at top) |
-| GHL location | TaylorKovar.com `CoD1jBJnfOnS8iAmntku` |
+| GHL location | TaylorKovar.com `CoD1jBJnfOnS8iAmntku`. The connector can reach several accounts, so pass this `locationId` on **every** GHL call (see Preflight) |
 | GHL userId (creator) | Taylor Kovar `0owaLTQF7YTV3EFV8N9c` |
 | GHL approver | Claudia Valladares `HVPbKziWl5cst6jueTAL` (Claudia@Choose11.com, her main login; don't use her old claudia@taylorkovar.com login `3nS0t3FsisxjJ3uDiKhI`) |
 | Image hosting | this repo; public URL = `https://raw.githubusercontent.com/taylorkovar/tk-media-graphics/main/<path>`. Images are rendered **by a GitHub Action** from a spec you queue (see "Publishing images") |
@@ -61,8 +61,15 @@ The team works Mon–Fri, so the task runs only on weekdays. Posts still go out 
 - **No back-to-back topics.** Before scheduling anything, look at what is already scheduled the day before, the same day and the day after (tracker Status dates plus `log.json` `scheduled_for`). Never put two posts on the same topic (e.g. two Social Security posts) within a day of each other. For a throwback, skip to the next empty-Status row on a different topic. For a new mention, move it to the nearest day without a same-topic post; a weekend 9:00 AM slot is fine since new mentions never land there otherwise. Note the move in `log.json`. (Team feedback 10/21/2026: an SS new mention and an SS throwback on the same Friday.)
 - Convert to UTC minding daylight saving: CDT is UTC−5 until Sun Nov 1 2026 (2 AM), then CST is UTC−6 until Sun Mar 14 2027.
 
+## Preflight — confirm GHL can reach TaylorKovar.com
+Do this first, before reading the tracker, building cards or queueing renders. (Added 11/3/2026: a run found the GHL connector signed in to a different account, Klear `3uJ6bty81MZukWy9ASp6`, and only failed at the posting step.)
+1. Call the GHL connector's `list_locations`. TaylorKovar.com `CoD1jBJnfOnS8iAmntku` must be in the list. Other accounts may appear too (Klear, The Money Couple, Standpipe Coffee House). Never post to them.
+2. Pass `locationId: "CoD1jBJnfOnS8iAmntku"` on every GHL call (`get-post`, `create-post`, `edit-post`). Never rely on the connector's default account.
+3. **If TaylorKovar.com is missing, or `list_locations` fails:** stop the run here. Don't build cards, queue renders or touch the tracker. Send the notification right away: "GHL connector can't reach TaylorKovar.com. Reconnect it in claude.ai Settings → Connectors (GHL TMC + TK) and pick the TaylorKovar.com account." Include which throwback dates (tomorrow through the target date) are still uncovered, so a human knows what will be missing.
+4. After each `create-post`, check that the response's `locationId` is `CoD1jBJnfOnS8iAmntku`. If it isn't, stop and report before creating any more.
+
 ## Step 0 — Handle rejected posts
-Do this first, every run, before Step 1. (Confirmed against a real rejection 10/29/2026.)
+Do this every run right after Preflight, before Step 1. (Confirmed against a real rejection 10/29/2026.)
 1. In `log.json`, take every entry whose `scheduled_for` is tomorrow or later and call `get-post` (params `{"path": {"id": ...}}`) on each ID in its `ghl_post_ids`.
 2. Read `postApprovalDetails.approvalStatus`. `pending` or `approved`: nothing to do. `rejected`: the post's `status` also turns `failed`, and Claudia's reason is in `postApprovalDetails.approverNote`.
 3. A rejection on one platform applies to the whole set (Main, Threads, Bluesky) when they share the card, so revise all three together.
