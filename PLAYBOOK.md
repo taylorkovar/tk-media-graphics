@@ -70,12 +70,13 @@ Do this first, before reading the tracker, building cards or queueing renders. (
 
 ## Step 0 — Handle rejected posts
 Do this every run right after Preflight, before Step 1. (Confirmed against a real rejection 10/29/2026.)
-1. In `log.json`, take every entry whose `scheduled_for` is tomorrow or later and call `get-post` (params `{"path": {"id": ...}}`) on each ID in its `ghl_post_ids`.
+1. In `log.json`, take every entry whose `scheduled_for` is **today or later** (including posts later today) and call `get-post` (params `{"path": {"id": ...}}`) on each ID in its `ghl_post_ids`.
 2. Read `postApprovalDetails.approvalStatus`. `pending` or `approved`: nothing to do. `rejected`: the post's `status` also turns `failed`, and Claudia's reason is in `postApprovalDetails.approverNote`.
 3. A rejection on one platform applies to the whole set (Main, Threads, Bluesky) when they share the card, so revise all three together.
    - **The note asks for something specific** (new photo, softer wording, shorter card): make the change. If the card changes, render it as `<same name>-v2.jpg` and publish and check it as usual. Then call `edit-post` on each post in place, keeping the same IDs and `scheduleDate`, with the full body (accountIds, summary, media, type, userId, platform details) plus `status: "in_review"` and `postApprovalDetails: {approver: <Claudia>, approvalStatus: "pending", requesterNote: "Revised per your note: <one line on what changed>. ..."}`. Use idempotency keys ending in `-rev1` (`-rev2` and so on after that). Call `get-post` again to confirm it reads `in_review` / `pending`. Update the row's captions, Reel Script and Graphic Link, but keep its Status.
    - **The note is empty or unclear, or says to drop the post:** don't revise or delete anything. Set the row's Status to `Rejected - <her note, or "no note">`. That reopens the date (the coverage check only counts `sched M/D`), so Step 2 fills it with another row, and the rejected row is never picked again.
-   - **The post goes out within 24 hours of this run:** don't revise. Report it so a human can handle it.
+   - **The post is today or tomorrow:** still revise it (it needs a fresh approval, so do it first thing). If its time has already passed or is less than 2 hours away, move all three posts in the set to 6:00 PM America/Chicago the same day (Threads/Bluesky posts that were deleted get recreated with new idempotency keys ending in `-rev1`), update the row's Status to the new `sched M/D h:mm`, and send a push notification right away saying Claudia needs to re-approve it today. (Added 11/4/2026: a 11/4 noon post was rejected at 9:26 AM and nothing went out that day because the old rule skipped same-day posts.)
+   - **A post in the set reads `deleted: true`:** treat it like a rejection with no note for that platform, and recreate it with the current caption if the rest of the set is being revised.
    - **The set already has a `revision` entry in `log.json` and was rejected again:** treat it as unclear.
 4. After a revision the old `approverNote` stays on the post. Decide only by `approvalStatus`, and never revise a post that reads `pending`.
 5. Add a `log.json` entry with `kind: "revision"`, `approver_note`, what changed, and any standing rule the note implies. Read past `revision` entries before writing new copy or choosing photos.
@@ -98,6 +99,19 @@ Work out which dates need a throwback (see Scheduling). For each one, earliest f
 
 ## Step 3 — Process one mention
 **Read the article.** Find what Taylor actually said. If Author is empty, fill the byline (add the outlet if syndicated, e.g. "Chris Adam (MoneyLion, syndicated on AOL)"). For the Author FB / Insta / X / LinkedIn columns, fill an empty one only with a handle or profile URL you actually found on the article page or the author's bio page. Otherwise leave it empty. Never guess a handle.
+
+**Tone: warm and calm (team decision 11/4/2026; this overrides any wry, punchy or clever examples further down).** After three rounds of feedback ("doesn't sound like Taylor", then "so aggressive"), the approved style is gentle and kind, on the reader's side, with no commands or pushy imperatives. Open by describing a relatable situation softly, share what Taylor told the outlet with "I mentioned to <outlet>" or "I shared with <outlet>", and close with a soft suggestion ("it may be worth looking into", "may be a nice way to try it out", "taking a quiet look may help"). Avoid imperative closers ("Open the mail this week."), clever one-liners and hooks ("Kinda chic...", "comes in two flavors"), and punchy phrases like "Good for you.", "Rip the band-aid off" or "I'd push back on". Card answer lines follow the same rule ("Taxes are worth a look." rather than "Look up that state's tax rules first."). Approved example (main caption):
+> A lot of people dream about moving somewhere new once they retire, maybe closer to the grandkids or somewhere a little warmer. It's an exciting decision, and taxes are one piece that's easy to overlook.
+>
+> I mentioned to GOBankingRates a while back that Pennsylvania tends to surprise people. It has a state income tax, but Social Security and most retirement income are exempt. Every state is a little different, and the rules can change.
+>
+> If a move is on your mind, it may be worth looking into before you decide.
+>
+> Check out the full article in the comments.
+
+The reference posts below are still useful for concrete everyday details and natural full sentences, but not for their edgy tone.
+
+**Photos:** treat pictures from the same shoot or event as the same photo. The teaching-a-room-with-a-mic shots (IMG_0974, IMG_1321, IMG_1322) and stage/lectern shots have been overused; vary the setting (desk/laptop, outdoors, travel, behind the scenes) or go type-only.
 
 **Write copy (Main caption, Threads caption, Bluesky caption, Reel Script).** Voice: Taylor, first person, writing the way he writes his own Facebook posts (reference posts from the team, 10/21/2026, below). **Taylor helps people build a life they actually want to live.**
 How his posts sound:
